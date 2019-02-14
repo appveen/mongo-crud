@@ -1,11 +1,18 @@
 const mongo = require('mongodb').MongoClient;
 let MongoRead = require('./utils/read');
 let URL = require('url');
-
 let log4js = require('log4js');
 const loggerName = process.env.HOSTNAME ? `[MongoUtil] [${process.env.HOSTNAME}]` : '[MongoUtil]';
-let logger = log4js.getLogger(loggerName);
 logger.level = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : 'info';
+log4js.configure({
+    levels: {
+      AUDIT: { value: Number.MAX_VALUE-1, colour: 'yellow' }
+    },
+    appenders: { out: { type: 'stdout', layout: { type: 'basic' } } },
+    categories: { default: { appenders: ['out'], level: logLevel.toUpperCase() } }
+    });
+let logger = log4js.getLogger(loggerName);
+
 
 let MongoDB = null;
 let defaults = {};
