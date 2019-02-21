@@ -21,6 +21,22 @@ function checkOptions(options, MongoDB) {
     return options;
 }
 
+function modifyDateFilter(filter, dateFields, dateFlag) {
+    if (Array.isArray(filter)) return filter.map(_f => modifyDateFilter(_f, dateFields, dateFlag));
+    if (typeof filter === 'object') {
+        let newFilter = {};
+        Object.keys(filter).forEach(_k => {
+            if (dateFields.indexOf(_k) > -1) {
+                newFilter[_k] = modifyDateFilter(filter[_k], dateFields, true);
+            } else {
+                newFilter[_k] = modifyDateFilter(filter[_k], dateFields, dateFlag);
+            }
+        });
+        return newFilter;
+    }
+    return dateFlag ? new Date(filter) : filter;
+}
+
 e.init = function (options) {
     index = options;
     logger = options.logger;
@@ -59,7 +75,9 @@ e.index = function (options) {
     if (search) {
         filter['$text'] = { '$search': search };
     }
-
+    if (options.dateFields && Array.isArray(options.dateFields)) {
+        filter = modifyDateFilter(filter, options.dateFields, false);
+    }
     let selectObject = {};
     if (select.length) {
         for (let i = 0; i < select.length; i++) {
@@ -95,6 +113,9 @@ e.count = function (options) {
     filter = _.assign({}, defaultFilter, filter);
     if (filter.omit) {
         filter = _.omit(filter, this.omit);
+    }
+    if (options.dateFields && Array.isArray(options.dateFields)) {
+        filter = modifyDateFilter(filter, options.dateFields, false);
     }
     let query = dbo.collection(colName).find(filter).count();
 
