@@ -22,6 +22,7 @@ function checkOptions(options, MongoDB) {
 }
 
 function modifyDateFilter(filter, dateFields, dateFlag) {
+    if(filter instanceof RegExp) return filter;
     if (Array.isArray(filter)) return filter.map(_f => modifyDateFilter(_f, dateFields, dateFlag));
     if (typeof filter === 'object') {
         let newFilter = {};
