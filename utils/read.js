@@ -22,9 +22,9 @@ function checkOptions(options, MongoDB) {
 }
 
 function modifyDateFilter(filter, dateFields, dateFlag) {
-    if(filter instanceof RegExp) return filter;
+    if (filter instanceof RegExp) return filter;
     if (Array.isArray(filter)) return filter.map(_f => modifyDateFilter(_f, dateFields, dateFlag));
-    if (typeof filter === 'object') {
+    if (filter.constructor == {}.constructor) {
         let newFilter = {};
         Object.keys(filter).forEach(_k => {
             if (dateFields.indexOf(_k) > -1) {
@@ -35,7 +35,7 @@ function modifyDateFilter(filter, dateFields, dateFlag) {
         });
         return newFilter;
     }
-    return dateFlag ? new Date(filter) : filter;
+    return dateFlag && typeof filter == 'string' ? new Date(filter) : filter;
 }
 
 e.init = function (options) {
