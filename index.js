@@ -18,7 +18,6 @@ let MongoDB = null;
 let defaults = {};
 
 function connect(url, options) {
-    url = URL.format(URL.parse(url));
     return new Promise((resolve, reject) => {
         defaults = options && options.defaults ? options.defaults : {};
         delete options.defaults;
